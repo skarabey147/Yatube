@@ -88,5 +88,11 @@ class Follow(models.Model):
         verbose_name='Автор постов'
     )
 
+    class Meta:
+        constraints = models.UniqueConstraint(
+            fields=['user', 'author'],
+            name='unique_follow'
+        )
+
     def __int__(self):
         return self.user

@@ -5,6 +5,7 @@
 {% block title %}Подписки{% endblock %}
 {% block content %}
   <h1>Подписки</h1>
+  {% include 'posts/includes/switcher.html' %}
   {% for post in page_obj %}
     <ul>
       <li>

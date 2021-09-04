@@ -223,8 +223,7 @@ class PostViewTest(TestCase):
     def test_follow_page(self):
         response = self.authorized_client.get(reverse('posts:follow_index'))
         first_object = response.context['page_obj'][0]
-        followed = Follow.objects.filter(user=self.user).values('author')
-        post_from_follow = Post.objects.filter(author__in=followed)
+        post_from_follow = Post.objects.filter(author__following__user=self.user)
         self._post_for_tests(first_object, post_from_follow[0])
 
     def test_user_follow(self):
@@ -255,12 +254,16 @@ class PaginatorViewsTest(TestCase):
             slug='test-slug',
             description='Тестовое описание',
         )
-        for i in range(1, 15):
-            Post.objects.create(
+        objs = [
+            Post(
                 text=f'Пост номер {i}',
                 author=cls.user,
                 group=cls.group
             )
+            for i in range(1, 15)
+        ]
+        posts = Post.objects.bulk_create(objs)
+
 
     def setUp(self):
         self.authorized_client = Client()

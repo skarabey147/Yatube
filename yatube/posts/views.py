@@ -96,8 +96,7 @@ def post_edit(request, post_id):
     )
     if request.method == 'POST':
         if form.is_valid():
-            post = form.save(commit=False)
-            post.save()
+            post = form.save()
             return redirect('posts:post_detail', post_id=post.pk)
         return render(request,
                       'posts/create_post.html',
@@ -125,8 +124,7 @@ def add_comment(request, post_id):
 
 @login_required
 def follow_index(request):
-    fol_authors = Follow.objects.filter(user=request.user).values('author')
-    post_list = Post.objects.filter(author__in=fol_authors)
+    post_list = Post.objects.filter(author__following__user=request.user)
     paginator = Paginator(post_list, settings.PAGINATOR_OBJ_PER_PAGE)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -139,13 +137,10 @@ def follow_index(request):
 @login_required
 def profile_follow(request, username):
     author = get_object_or_404(User, username=username).id
-    sub = Follow.objects.filter(
-        user=request.user, author__username=username
-    )
-    if str(request.user) == username or sub.exists() is True:
+    if str(request.user) == username:
         return redirect('posts:profile', username=username)
     else:
-        Follow.objects.create(user_id=request.user.id, author_id=author)
+        Follow.objects.get_or_create(user_id=request.user.id, author_id=author)
         return redirect('posts:profile', username=username)
 
 
