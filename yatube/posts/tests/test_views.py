@@ -223,13 +223,15 @@ class PostViewTest(TestCase):
     def test_follow_page(self):
         response = self.authorized_client.get(reverse('posts:follow_index'))
         first_object = response.context['page_obj'][0]
-        post_from_follow = Post.objects.filter(author__following__user=self.user)
-        self._post_for_tests(first_object, post_from_follow[0])
+        posts = Post.objects.filter(author__following__user=self.user)
+        self._post_for_tests(first_object, posts[0])
 
     def test_user_follow(self):
         follow_count = Follow.objects.count()
         self.authorized_client.get(
-            reverse('posts:profile_follow', kwargs={'username': self.author_2})
+            reverse(
+                'posts:profile_follow', kwargs={'username': self.author_2}
+            )
         )
         follow_count_2 = Follow.objects.count()
         self.assertEqual(follow_count_2, follow_count + 1)
@@ -262,8 +264,7 @@ class PaginatorViewsTest(TestCase):
             )
             for i in range(1, 15)
         ]
-        posts = Post.objects.bulk_create(objs)
-
+        Post.objects.bulk_create(objs)
 
     def setUp(self):
         self.authorized_client = Client()
