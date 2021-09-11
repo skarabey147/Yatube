@@ -38,18 +38,12 @@ def profile(request, username):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     qs = Follow.objects.filter(user_id=request.user.id, author_id=author.id)
-    if str(request.user) == username:
-        self_follow = True
-    else:
-        self_follow = False
-    if request.user.id in qs.values_list('user_id', flat=True):
+    if qs.exists():
         following = True
     else:
         following = False
     context = {
-        'self_follow': self_follow,
         'following': following,
-        'user_post_list': user_post_list,
         'author': author,
         'page_obj': page_obj,
     }
@@ -81,7 +75,6 @@ def post_create(request):
                       {'form': form})
     context = {
         'form': form,
-        'title': 'Новый пост',
     }
     return render(request, 'posts/create_post.html', context)
 
@@ -98,10 +91,6 @@ def post_edit(request, post_id):
         if form.is_valid():
             post = form.save()
             return redirect('posts:post_detail', post_id=post.pk)
-        return render(request,
-                      'posts/create_post.html',
-                      {'form': form},
-                      )
     context = {
         'form': form,
         'title': 'Редактировать пост',
@@ -147,5 +136,5 @@ def profile_follow(request, username):
 @login_required
 def profile_unfollow(request, username):
     author = get_object_or_404(User, username=username).id
-    Follow.objects.get(user_id=request.user.id, author_id=author).delete()
+    Follow.objects.filter(user_id=request.user.id, author_id=author).delete()
     return redirect('posts:profile', username=username)

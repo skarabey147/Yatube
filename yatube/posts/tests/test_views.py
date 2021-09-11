@@ -213,6 +213,11 @@ class PostViewTest(TestCase):
 
     def test_create_new_comment(self):
         """Тест создания нового комментария"""
+        Comment.objects.create(
+            text='Текст нового коммента',
+            author=self.user,
+            post=self.post,
+        )
         comment_count = Comment.objects.count()
         response = self.authorized_client.get(
             reverse('posts:post_detail',
@@ -235,6 +240,16 @@ class PostViewTest(TestCase):
         )
         follow_count_2 = Follow.objects.count()
         self.assertEqual(follow_count_2, follow_count + 1)
+
+    def test_user_follow_content(self):
+        self.authorized_client.get(
+            reverse(
+                'posts:profile_follow', kwargs={'username': self.author_2}
+            )
+        )
+        new_follow = Follow.objects.filter(user=self.user, author=self.author_2)
+        self.assertTrue(new_follow.exists())
+
 
     def test_user_unfollow(self):
         follow_count = Follow.objects.count()

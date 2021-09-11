@@ -4,9 +4,9 @@
 {% block content %}
 <div class="mb-5">
   <h1>Все посты пользователя {{ author.get_full_name }}</h1>
-  <h3>Всего постов: {{ user_post_list.count }} </h3>
-  {% if self_follow %}
-      <h3>Нельзя подписаться на себя</h3>
+  <h3>Всего постов: {{ author.posts.count }} </h3>
+  {% if user.is_authenticated %}
+  {% if author.username == user.username %}
   {% else %}
     {% if following %}
     <a
@@ -23,6 +23,7 @@
         Подписаться
       </a>
     {% endif %}
+  {% endif %}
   {% endif %}
 </div>
   {% for post in page_obj %}
