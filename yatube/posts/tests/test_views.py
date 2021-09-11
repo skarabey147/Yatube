@@ -247,9 +247,10 @@ class PostViewTest(TestCase):
                 'posts:profile_follow', kwargs={'username': self.author_2}
             )
         )
-        new_follow = Follow.objects.filter(user=self.user, author=self.author_2)
+        new_follow = Follow.objects.filter(
+            user=self.user, author=self.author_2
+        )
         self.assertTrue(new_follow.exists())
-
 
     def test_user_unfollow(self):
         follow_count = Follow.objects.count()
