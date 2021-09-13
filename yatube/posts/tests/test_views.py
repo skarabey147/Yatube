@@ -213,25 +213,27 @@ class PostViewTest(TestCase):
 
     def test_create_new_comment(self):
         """Тест создания нового комментария"""
-        Comment.objects.create(
-            text='Текст нового коммента',
-            author=self.user,
-            post=self.post,
-        )
         comment_count = Comment.objects.count()
-        response = self.authorized_client.get(
-            reverse('posts:post_detail',
-                    kwargs={'post_id': PostViewTest.post.id})
+        response = self.authorized_client.post(
+            reverse('posts:add_comment', args=[self.post.id]),
+            data={
+                'text': 'Текст комментария',
+                'post': self.post,
+                'author': self.author,
+            },
+            follow=True
         )
-        self.assertEqual(len(response.context['comments']), comment_count)
+        self.assertEqual(len(response.context['comments']), comment_count + 1)
 
     def test_follow_page(self):
+        """Шаблон Follow сформирован с правильным контекстом"""
         response = self.authorized_client.get(reverse('posts:follow_index'))
         first_object = response.context['page_obj'][0]
         posts = Post.objects.filter(author__following__user=self.user)
         self._post_for_tests(first_object, posts[0])
 
     def test_user_follow(self):
+        """Тест создания подписки"""
         follow_count = Follow.objects.count()
         self.authorized_client.get(
             reverse(
@@ -239,20 +241,14 @@ class PostViewTest(TestCase):
             )
         )
         follow_count_2 = Follow.objects.count()
-        self.assertEqual(follow_count_2, follow_count + 1)
-
-    def test_user_follow_content(self):
-        self.authorized_client.get(
-            reverse(
-                'posts:profile_follow', kwargs={'username': self.author_2}
-            )
-        )
         new_follow = Follow.objects.filter(
             user=self.user, author=self.author_2
         )
         self.assertTrue(new_follow.exists())
+        self.assertEqual(follow_count_2, follow_count + 1)
 
     def test_user_unfollow(self):
+        """Тест отписки от автора"""
         follow_count = Follow.objects.count()
         self.authorized_client.get(
             reverse('posts:profile_unfollow', kwargs={'username': self.author})
