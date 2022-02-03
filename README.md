@@ -1,3 +1,54 @@
-# hw05_final
+# Yatube
+  
+## Описание проекта
+Что такое Yatube? Это социальная сеть для публикации личных дневников.
+### Что реализованно?
+Можно создать свою страницу. Если на нее зайти, то можно посмотреть все записи автора.
+  Пользователи могут заходить на чужие страницы, подписываться на авторов и комментировать их записи.
+  Автор может выбрать для своей страницы имя и уникальный адрес.
+  Модерирование записей и блокирование пользователей через Админ панель.
+  Записи можно отправить в сообщество и посмотреть там записи разных авторов.
 
-[![CI](https://github.com/yandex-praktikum/hw05_final/actions/workflows/python-app.yml/badge.svg?branch=master)](https://github.com/yandex-praktikum/hw05_final/actions/workflows/python-app.yml)
+## Как запустить проект:  
+  
+Клонировать репозиторий и перейти в него в командной строке:  
+  
+```  
+https://github.com/skarabey147/api_final_yatube.git 
+```  
+  
+```  
+cd api_final_yatube  
+```  
+  
+Cоздать и активировать виртуальное окружение:  
+  
+```  
+python3 -m venv env  
+```  
+
+```  
+source env/scripts/activate  
+```  
+Обновить менеджер пакетов pip
+```  
+python3 -m pip install --upgrade pip  
+```  
+  
+Установить зависимости из файла requirements.txt:  
+  
+```  
+pip install -r requirements.txt  
+```  
+  
+Выполнить миграции:  
+  
+```  
+python3 manage.py migrate  
+```  
+  
+Запустить проект:  
+  
+```  
+python3 manage.py runserver  
+```
