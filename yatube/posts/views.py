@@ -8,6 +8,9 @@ from .models import Comment, Follow, Group, Post, User
 
 
 def index(request):
+    """
+    Главная страница. Отображает все последние опубликованные посты
+    """
     post_list = Post.objects.all()
     paginator = Paginator(post_list, settings.PAGINATOR_OBJ_PER_PAGE)
     page_number = request.GET.get('page')
@@ -19,6 +22,9 @@ def index(request):
 
 
 def group_posts(request, slug):
+    """
+    Страница группы. Показывает отфильтрованные по группе посты.
+    """
     group = get_object_or_404(Group, slug=slug)
     group_posts_list = group.posts.all()
     paginator = Paginator(group_posts_list, settings.PAGINATOR_OBJ_PER_PAGE)
@@ -32,6 +38,9 @@ def group_posts(request, slug):
 
 
 def profile(request, username):
+    """
+    Страница профиля. Показывает отфильтрованные по пользователю посты.
+    """
     author = get_object_or_404(User, username=username)
     user_post_list = Post.objects.filter(author__username=username)
     paginator = Paginator(user_post_list, settings.PAGINATOR_OBJ_PER_PAGE)
@@ -51,6 +60,9 @@ def profile(request, username):
 
 
 def post_detail(request, post_id):
+    """
+    Просмотр выбранного поста.
+    """
     post = get_object_or_404(Post, pk=post_id)
     form = CommentForm(request.POST or None)
     comments = Comment.objects.filter(post__id=post_id)
@@ -64,6 +76,9 @@ def post_detail(request, post_id):
 
 @login_required
 def post_create(request):
+    """
+    Страница создания поста.
+    """
     form = PostForm(request.POST or None)
     if request.method == 'POST':
         if form.is_valid():
@@ -81,6 +96,9 @@ def post_create(request):
 
 @login_required
 def post_edit(request, post_id):
+    """
+    Страница редактирования поста.
+    """
     selected_post = get_object_or_404(Post, pk=post_id)
     form = PostForm(
         request.POST or None,
@@ -101,6 +119,9 @@ def post_edit(request, post_id):
 
 @login_required
 def add_comment(request, post_id):
+    """
+    Добавление комментария.
+    """
     post = get_object_or_404(Post, pk=post_id)
     form = CommentForm(request.POST or None)
     if form.is_valid():
@@ -113,6 +134,9 @@ def add_comment(request, post_id):
 
 @login_required
 def follow_index(request):
+    """
+    Страница подписок. Фильтрует посты по отслеживаемым пользователям
+    """
     post_list = Post.objects.filter(author__following__user=request.user)
     paginator = Paginator(post_list, settings.PAGINATOR_OBJ_PER_PAGE)
     page_number = request.GET.get('page')
@@ -125,6 +149,9 @@ def follow_index(request):
 
 @login_required
 def profile_follow(request, username):
+    """
+    Кнопка подписки на пользователя
+    """
     author = get_object_or_404(User, username=username).id
     if str(request.user) == username:
         return redirect('posts:profile', username=username)
@@ -135,6 +162,9 @@ def profile_follow(request, username):
 
 @login_required
 def profile_unfollow(request, username):
+    """
+    Кнопка отписки от пользователя
+    """
     author = get_object_or_404(User, username=username).id
     Follow.objects.filter(user_id=request.user.id, author_id=author).delete()
     return redirect('posts:profile', username=username)
